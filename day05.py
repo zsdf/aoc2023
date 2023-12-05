@@ -178,7 +178,7 @@ def solve2_reverse(lines: list[str]) -> int:
     while True:
         seed = find_value(almanac, "seed", "location", location)
         for base, count in seed_ranges:
-            if base <= seed <= base + count:
+            if base <= seed < base + count:
                 return location
         location += 1
 
