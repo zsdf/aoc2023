@@ -1,3 +1,4 @@
+import math
 import re
 
 SAMPLE_INPUT = [
@@ -58,13 +59,6 @@ def is_end_node(node: str) -> bool:
     return node.endswith("Z")
 
 
-# 1. there is some number of steps that it takes to be in the win condition
-# 2. there is some number of steps that each starting node will peridically be
-#    in a win condition (possibly more than one?)
-#    offset + cycle_length
-# hmmm
-
-
 def parse_graph(lines: list[str]) -> dict[str, dict[str, str]]:
     """
     Returns a dictionary like
@@ -103,8 +97,25 @@ def solve2_naive(lines: list[str]) -> int:
     return steps
 
 
+def solve2(lines: list[str]) -> int:
+    directions = lines[0]
+    graph = parse_graph(lines[2:])
+
+    start_nodes = list(filter(is_start_node, graph.keys()))
+
+    cycle_times: list[int] = []
+    for node in start_nodes:
+        step = 0
+        while not is_end_node(node):
+            node = graph[node][directions[step % len(directions)]]
+            step += 1
+        cycle_times.append(step)
+
+    return math.lcm(*cycle_times)
+
+
 def main() -> None:
-    with open("data/day08") as f:
+    with open("data/day08", encoding="utf-8") as f:
         data = f.read().splitlines()
 
     assert solve1(SAMPLE_INPUT[0].splitlines()) == 2
@@ -115,6 +126,9 @@ def main() -> None:
     assert s1 == 18827
 
     assert solve2_naive(SAMPLE_INPUT[2].splitlines()) == 6
+    s2 = solve2(data)
+    print(s2)
+    assert s2 == 20220305520997
 
 
 if __name__ == "__main__":
