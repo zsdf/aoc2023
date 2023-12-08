@@ -48,9 +48,8 @@ def find_min_max_calc(time: int, dist: int) -> Tuple[int, int]:
     The distance traveled is described by `dist = (time - x) * x`, which is
     a quadtratic equation, so we can just calculate the roots to solve it.
     """
-    winners = []
     winners = roots(-1, time, -dist)
-    return math.floor(winners[0]), math.floor(winners[1])
+    return math.ceil(winners[0]), math.floor(winners[1])
 
 
 # hold down button
@@ -80,7 +79,8 @@ def solve2(lines: list[str]) -> int:
     time, dist = next(zip(line_numbers(lines[0]), line_numbers(lines[1])))
 
     x1, x2 = find_min_max_calc(time, dist)
-    return x2 - x1
+    # if x2 == x2 then the answer is 1, not 0
+    return x2 - x1 + 1
 
 
 def main():
