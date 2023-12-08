@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import re
 from typing import Tuple
-import sys
 
 # (79,93) -> (81,95)
 # (55,68) -> (57,70)
@@ -54,7 +53,7 @@ def parse_seeds(line: str) -> list[range]:
 
 
 def parse_mappings(lines: list[str]) -> dict[str, Tuple[str, list[Mapping]]]:
-    mappings = {}
+    mappings: dict[str, Tuple[str, list[Mapping]]] = {}
     ranges: list[Mapping] = []
     stype = ""
     dtype = ""
@@ -85,9 +84,9 @@ def project(r: range, m: Mapping) -> range:
     return range(r.start + offset, r.stop + offset)
 
 
-def split(r: range, d: range) -> Tuple[range, range]:
-    """Returns the portition of r contained by d, and the remainder"""
-    pass
+# def split(r: range, d: range) -> Tuple[range, range]:
+#     """Returns the portition of r contained by d, and the remainder"""
+#     pass
 
 
 def contains(r: range, d: range) -> bool:
@@ -149,7 +148,7 @@ def solve(lines: list[str]) -> int:
     src_ranges = initial_seeds
     while src_type != "location":
         dst_type, maps = mappings[src_type]
-        dst_ranges = []
+        dst_ranges: list[range] = []
         for src_range in src_ranges:
             dst_ranges += find_ranges(src_range, maps)
         src_type = dst_type

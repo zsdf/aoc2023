@@ -22,8 +22,8 @@ def adjacencies(pos: Tuple[int, int]) -> list[Tuple[int, int]]:
 
 def parse_input(data: list[str]):
     id_seq = 0
-    numbers = {}
-    symbols = {}
+    numbers: dict[Tuple[int, int], Tuple[int, int]] = {}
+    symbols: dict[Tuple[int, int], str] = {}
 
     for y, line in enumerate(data):
         # find all symbols on the line and record their positions
@@ -50,39 +50,40 @@ def parse_input(data: list[str]):
 def solve1(data: list[str]) -> int:
     numbers, symbols = parse_input(data)
 
-    known_parts = set()
-    sum = 0
+    known_parts: set[int] = set()
+    total = 0
 
-    for k, (id, val) in numbers.items():
+    for number_pos, (key, val) in numbers.items():
         # if adjacent to a symbol...
-        for pos in adjacencies(k):
-            if pos in symbols and id not in known_parts:
-                sum += val
-                known_parts.add(id)
+        for pos in adjacencies(number_pos):
+            if pos in symbols and key not in known_parts:
+                total += val
+                known_parts.add(key)
                 # print("part:", id, val)
 
-    return sum
+    return total
 
 
 def solve2(data: list[str]) -> int:
     numbers, symbols = parse_input(data)
 
-    sum = 0
+    total = 0
     for symbol_pos, symbol in symbols.items():
         if symbol != "*":
             continue
-        adjacent_numbers = {}
+        adjacent_numbers: dict[int, int] = {}
         for pos in adjacencies(symbol_pos):
             if pos in numbers:
                 (number_id, number_value) = numbers[pos]
                 adjacent_numbers[number_id] = number_value
         if len(adjacent_numbers) == 2:
             values = list(adjacent_numbers.values())
-            sum += values[0] * values[1]
-    return sum
+            total += values[0] * values[1]
+    return total
 
 
-sample_input = """467..114..
+SAMPLE_INPUT = """\
+467..114..
 ...*......
 ..35..633.
 ......#...
@@ -96,17 +97,18 @@ sample_input = """467..114..
 
 
 def main():
-    # sample_data = sample_input.splitlines()
-    with open("data/day03") as f:
+    with open("data/day03", encoding="utf-8") as f:
         data = f.read().splitlines()
 
+    assert solve1(SAMPLE_INPUT.splitlines()) == 4361
     s1 = solve1(data)
     print(s1)
     assert s1 == 525119
 
+    assert solve2(SAMPLE_INPUT.splitlines()) == 467835
     s2 = solve2(data)
     print(s2)
-    assert s1 == 76504829
+    assert s2 == 76504829
 
 
 if __name__ == "__main__":

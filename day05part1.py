@@ -1,6 +1,4 @@
-from datetime import datetime
 import re
-import sys
 from typing import Tuple
 
 # format
@@ -52,17 +50,14 @@ humidity-to-location map:
 56 93 4
 """
 
-
-def abort(message: str) -> None:  # or never?
-    print(message, file=sys.stderr)
-    sys.exit(1)
+Almanac = dict[str, Tuple[str, list[Tuple[int, int, int]]]]
 
 
 def parse_input(lines: list[str]):
     initial_seeds = [int(n) for n in re.findall(r"\d+", lines[0])]
 
-    almanac = {}
-    reverse = {}
+    almanac: Almanac = {}
+    reverse: Almanac = {}
 
     src_type = ""
     dst_type = ""
@@ -84,7 +79,7 @@ def parse_input(lines: list[str]):
             (src_type, dst_type) = match.groups()
         elif matches := re.findall(r"\d+", line):
             if len(matches) != 3:
-                abort(f"error line {ln+2}: {line}")
+                raise RuntimeError(f"error reading line {ln + 2}: {line}")
             [dst, src, range_len] = [int(n) for n in matches]
             # the data contains ranges far too long to want to do this
             # for i in range(0, range_len):
@@ -92,33 +87,30 @@ def parse_input(lines: list[str]):
             m.append((dst, src, range_len))
             r.append((src, dst, range_len))
         else:
-            abort(f"error line {ln+2}: {line}")
+            raise RuntimeError(f"error reading line {ln + 2}: {line}")
 
     return (initial_seeds, almanac, reverse)
 
 
-def find_value(almanac, desired_type, src_type, src_val):
+def find_value(almanac: Almanac, desired_type: str, src_type: str, src_val: int) -> int:
     """
     Finds the value in almanac corresponding to... better docstring
     """
     # NOTE: iteration vs recursion saves no noticable time
     # print(src_type, src_val)
-    while src_type != desired_type:
-        dst_type, m = almanac[src_type]
+    if src_type == desired_type:
+        return src_val
 
-        dst_val = src_val
-        # this is a small number - linear search ought to be okay.
-        # we could sort it and use binary search but I doubt we'll benefit much
-        for dst, src, count in m:
-            if src <= src_val < src + count:
-                dst_val = dst + src_val - src
+    dst_type, m = almanac[src_type]
 
-        if dst_type == desired_type:
-            return dst_val
-        else:
-            # return find_value(almanac, desired_type, dst_type, dst_val)
-            src_type = dst_type
-            src_val = dst_val
+    dst_val = src_val
+    # this is a small number - linear search ought to be okay.
+    # we could sort it and use binary search but I doubt we'll benefit much
+    for dst, src, count in m:
+        if src <= src_val < src + count:
+            dst_val = dst + src_val - src
+
+    return find_value(almanac, desired_type, dst_type, dst_val)
 
 
 def solve1(lines: list[str]) -> int:
@@ -127,7 +119,7 @@ def solve1(lines: list[str]) -> int:
     """
     (initial_seeds, almanac, _) = parse_input(lines)
 
-    locations = []
+    locations: list[int] = []
     for seed in initial_seeds:
         locations.append(find_value(almanac, "location", "seed", seed))
     return min(locations)
@@ -193,11 +185,11 @@ def main():
     print(s1)
     assert s1 == 621354867
 
-    solve2 = solve2_reverse
-    assert solve2(SAMPLE_INPUT.splitlines()) == 46
-    s2 = solve2(data)
-    print(s2)
-    assert s2 == 15880236
+    # solve2 = solve2_reverse
+    # assert solve2(SAMPLE_INPUT.splitlines()) == 46
+    # s2 = solve2(data)
+    # print(s2)
+    # assert s2 == 15880236
 
 
 if __name__ == "__main__":

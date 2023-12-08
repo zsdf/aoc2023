@@ -11,7 +11,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
 
 
 def score_cards(data: list[str]) -> list[int]:
-    cards = []
+    cards: list[int] = []
     for line in data:
         [_, winning_input, ticket_input] = re.split(r"[:|]", line)
         winners = set(int(n) for n in re.findall(r"\d+", winning_input))
@@ -37,7 +37,7 @@ def solve1(data: list[str]) -> int:
 def solve2(data: list[str]) -> int:
     max_cards = len(data)
     scored_cards = score_cards(data)
-    cards = [1 for n in range(0, len(data))]
+    cards = [1] * len(data)
 
     for i, points in enumerate(scored_cards):
         for j in range(1, points + 1):
